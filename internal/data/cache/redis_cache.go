@@ -133,10 +133,13 @@ func (r *redisCache) RetrieveRecentUpdates(numUpdates int) ([]*dto.WidgetConnect
 	}
 
 	// Parse the result. First element is the serial number of widget, rest 6
-	// elements are connection hash result (p, q, r key/val pairs)
+	// elements are connection hash result (p, q, r key/val pairs).
+	//
 	resVal := res.Val().([]any)
-	ret := make([]*dto.WidgetConnections, len(resVal))
-	for i, v := range resVal {
+	ret := make([]*dto.WidgetConnections, 0, len(resVal))
+	// sn: index in ret
+	presentSerialNumbers := map[string]int{}
+	for _, v := range resVal {
 		v := v.([]any)
 		el := &dto.WidgetConnections{}
 		el.SerialNumber = v[0].(string)
@@ -153,7 +156,16 @@ func (r *redisCache) RetrieveRecentUpdates(numUpdates int) ([]*dto.WidgetConnect
 				el.R_PeerSerialNumber = val
 			}
 		}
-		ret[i] = el
+
+		// Ensure that one serial number (owner widget) is present in the result
+		// only once.
+		if indexInRet, present := presentSerialNumbers[el.SerialNumber]; present {
+			ret[indexInRet] = el
+		} else {
+			ret = append(ret, el)
+			presentSerialNumbers[el.SerialNumber] = len(ret) - 1
+		}
+
 	}
 
 	return ret, nil

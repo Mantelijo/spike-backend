@@ -17,6 +17,8 @@ curl -X POST -d '{"name": "widget1", "serial_number": "321", "ports": ["P", "R"]
 curl -X PUT -d '{"port_type": "P", "widget_serial_num": "123", "peer_widget_serial_num": "321"}' localhost:8080/widgets/associations
 ```
 
+See `cmd/test/main.go` for more test runs.
+
 
 # Architecture, design notes and ideas below
 
@@ -138,17 +140,17 @@ Payload:
 # Deployment strategy
 
 - Stateless services: K8S or ECS equivalent with autoscaling based on QPS for the API service
-  and Data reconciliation servies. Simple rolling deployment updates should be
+  and Data reconciliation (if separated) services. Simple rolling deployment updates should be
   sufficient.
 - Postgres HA in same region as stateless services
   - Depending of resouce usage, we could also use pg bouncer for conn pooling if
     many reads start hitting the db.
 - Redis (ValKey, KeyDB, etc) cluster in the same zone as the API service instances 
-  - Configure with AOF persistence for data durability.
+  - Configure with AOF persistence for data durability (should be configured out of the box)
 
 # Additional notes
 
-- For the sake of time, no tests are provided
+- For the sake of time, no tests are provided, some implementation details are left out (panics, or logs provided)
 - Integration tests would be most appropriate for this services since there is
   not too much business logic to test.
     - Integration test plan could include spinning up the API service with pg
@@ -157,7 +159,7 @@ Payload:
     - Load/Benchmark testing 
 
 # TODO
-[] Redis cache component
-[] Db layer
-[] Http api component
-[] Data reconciliation component
+[x] Redis cache component
+[x] Db layer
+[x] Http api component
+[x] Data reconciliation component

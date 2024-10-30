@@ -16,7 +16,7 @@ func RunDataReconciler(rc cache.RedisCache, db database.DBService) {
 
 	for {
 		t1 := time.Now()
-		connUpdates, err := rc.RetrieveRecentUpdates(500)
+		connUpdates, err := rc.RetrieveRecentUpdates(1000)
 		if err != nil {
 			slog.Error("Failed to retrieve recent updates", slog.Any("error", err))
 			time.Sleep(time.Second)
@@ -36,7 +36,7 @@ func RunDataReconciler(rc cache.RedisCache, db database.DBService) {
 			continue
 		}
 
-		end := time.Until(t1)
+		end := time.Since(t1)
 		slog.Info("Data reconciler run completed", slog.Any("duration", end))
 	}
 
