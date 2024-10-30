@@ -66,7 +66,9 @@ func (api *HttpApi) createWidget(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *HttpApi) removeWidget(w http.ResponseWriter, r *http.Request) {
-
+	panic("not implemented")
+	// DB DELETE widget with automatic widget conns deletion
+	// Delete from cache
 }
 
 type associateWidgetRequest struct {
